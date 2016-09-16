@@ -26,10 +26,6 @@ THE SOFTWARE.
     Author     : osric
 */
 
-* {
-    
-}
-
 #grid {
     width: 250px;
     margin: 0 auto;
@@ -46,34 +42,24 @@ THE SOFTWARE.
 }
 
 .pop {
+    display: inline-block;
+    width: 50px;    
+    margin: 4px;
+    border-radius: 4px;
     position: absolute;    
-    bottom: -5px;
-    left: -5px;
-    background: #ffcc66;
+    bottom: -4px;
+    left: -4px;
+    border: none;    
 }
 
 .popup {    
-    animation: fill 2000ms 1 forwards;
+    transition: height 1.0s cubic-bezier(0.645, 0.045, 0.355, 1);;
 }
 
 .popdown {
-    animation: empty 500ms 1 forwards;
+    transition: height 0.25s linear;
 }
 
-@keyframes fill {
-    0% {
-        height: 0px;
-    }
-    100% {
-        height: 50px;
-    }
-}
-
-@keyframes empty {
-    0% {
-        height: 50px;
-    }
-    100% {
-        height: 0px;
-    }
+.popout {
+    transition: background 0.25s;
 }
