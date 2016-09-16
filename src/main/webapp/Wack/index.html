@@ -25,16 +25,19 @@ THE SOFTWARE.
 <html>
     <head>
         <title>Wack-A-Mole</title>
-        <link type="text/css" rel="stylesheet" href="wack.css" />
+        <link id="styles" type="text/css" rel="stylesheet" href="wack.css" />
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
+        <div id="status">
+        <div id="score">Score: 0</div>
+        <div id="time">30 seconds</div>
+        </div>
         <div>
         <div id="grid"></div>
         </div>
-        <div id="score">0</div>
-        <div id="time">30 seconds</div>        
+        
         <script src="wack.js"></script>
     </body>
 </html>

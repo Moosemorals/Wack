@@ -26,9 +26,19 @@ THE SOFTWARE.
     Author     : osric
 */
 
-#grid {
-    width: 250px;
+body {
+    width: 236px;
     margin: 0 auto;
+}
+#grid {        
+   
+}
+
+#status {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-around;
 }
 
 .cell {
@@ -53,7 +63,7 @@ THE SOFTWARE.
 }
 
 .popup {    
-    transition: height 1.0s cubic-bezier(0.645, 0.045, 0.355, 1);;
+    transition: height 5.0s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 
 .popdown {
@@ -62,4 +72,9 @@ THE SOFTWARE.
 
 .popout {
     transition: background 0.25s;
+}
+
+.rotate {
+    transform: rotate(0deg);
+    transition: transform 2.0s cubic-bezier(0.645, 0.045, 0.355, 1);
 }

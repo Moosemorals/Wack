@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+"use strict";
 
 var g = {
     score : 0,
@@ -42,7 +42,7 @@ function showText(id, text) {
 
 function score() {
     g.score += 1;
-    showText("score", g.score);
+    showText("score","Score: " + g.score);
 }
 
 function getRandomInt() {
@@ -74,17 +74,23 @@ function drawGrid() {
 
 function tidy(box) {
     box.removeEventListener("click", boxClick);
-    box.removeEventListener("transitionend", timeout);
-    box.addEventListener("transitionend", function () {
+    box.removeEventListener("transitionend", timeout, true);
+    box.addEventListener("transitionend", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
         box.parentNode.removeChild(box);
         if (g.running) {
             nextMole();
         }
-    });
+    }, true);
     
 }
 
 function timeout(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
     var box = e.target;
     
     tidy(box);
@@ -98,7 +104,9 @@ function timeout(e) {
 function boxClick(e) {
     var box = e.target;
 
-    tidy(box);
+    tidy(box);      
+    
+    doRotate(document.getElementById("grid"));
     
     box.style.height = box.scrollHeight + "px";
 
@@ -115,14 +123,14 @@ function showBox(cell) {
     box.classList.add("pop");
     box.classList.add("popup");
     box.style.height = "0px";
-    
+        
     setTimeout(function () {
         box.style.height = "50px";
         box.style.background = "#ffcc66";
     }, 25);
 
     box.addEventListener("click", boxClick);
-    box.addEventListener("transitionend", timeout);
+    box.addEventListener("transitionend", timeout, true);
     
     cell.appendChild(box);
 }
@@ -132,19 +140,21 @@ function nextMole() {
     var col = getRandomInt();
 
     var cell = document.getElementById("cell-" + row + "-" + col);
-
+    
     showBox(cell);
 }
 
 function tick() {
-    var sleep;
+    var sleep, left;
     var now = Date.now();
     var diff = (now - g.lastTick);
     g.lastTick = now;
 
     g.time += diff;
     
-    showText("time", 30 - (Math.floor(g.time / 1000) ));
+    left = 30 - (Math.floor(g.time / 1000) );
+    
+    showText("time", left + " second" + (left !== 1 ? 's' : ''));
     
     sleep = 1000 - (g.time % 1000);
     
@@ -155,9 +165,67 @@ function tick() {
     }
 }
 
+function getStyle(selector) {
+    var i;
+    var sheet = document.getElementById("styles").sheet;
+    for (i = 0; i < sheet.cssRules.length; i+= 1) {
+        if (sheet.cssRules[i].type === 1 && sheet.cssRules[i].selectorText === selector) { // STYLE_RULE
+            return sheet.cssRules[i].style;
+        }
+    }
+    return null;
+}
+
+function changeSpeed(time) {
+    var style = getStyle(".popup");
+    var oldTime = style.getPropertyValue("transition-duration");
+    
+    style.setProperty("transition-duration", time);
+    setTimeout(function () { 
+        style.setProperty("transition-duration", oldTime);
+    }, 2000);   
+}
+
+function doRotate(target) {
+    target.classList.add("rotate");
+    
+    target.addEventListener("transitionend", doneRotate, true);
+    setTimeout(function () {
+        var style = getStyle(".rotate");
+        style.setProperty("transform", "rotate(360deg)");        
+    }, 10);
+    
+}
+
+function doneRotate(e) {
+    if (e.target.classList.contains("rotate")) {
+        e.target.removeEventListener("transitionend", doneRotate, true);       
+        var style = getStyle(".rotate");
+        style.setProperty("transform", "rotate(0deg)");
+        e.target.classList.remove("rotate");
+    }
+}
+
+function listStyles() {
+    var ss = document.getElementById("styles").sheet;
+    var i, j, style, name, rule;
+    for (i = 0; i < ss.cssRules.length; i+= 1) {
+        if (ss.cssRules[i].type === 1 ) { // STYLE_RULE
+            name = ss.cssRules[i].selectorText;
+            style = ss.cssRules[i].style;
+            
+            console.log("Got a block called " + name);
+            for (j = 0; j < style.length ; j+= 1) {                
+                console.log(j + ": " + style[j]);
+            }            
+        }
+    }
+}
+
 function init() {
     drawGrid();
-    g.lastTick = Date.now();
+    g.lastTick = Date.now();   
+//    listStyles();
     nextMole();
     tick();
 }
