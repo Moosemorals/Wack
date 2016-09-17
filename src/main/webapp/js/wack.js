@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2016 osric.
+ * Copyright 2016 Osric Wilkinson <osric@fluffypeople.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,30 +23,109 @@
  */
 "use strict";
 
+var ROTATE_TEXT = " \u27F3";
+
 var g = {
-    score : 0,
-    time : 0,
-    lastTick : 0,
-    running : true
+    score: 0,
+    time: 0,
+    lastTick: 0,
+    running: true,
+    rotating: false,
+    currentEffect: null
 };
+
+var effects = (function () {
+
+    function changeSpeed(time) {
+        var style = getStyle(".popup");
+        var oldTime = style.getPropertyValue("transition-duration");
+
+        oldTime = parseInt(oldTime, 10);
+        console.log("old time: " + oldTime);
+
+        var newTime = oldTime * time;
+        console.log("new time: " + newTime);
+
+        style.setProperty("transition-duration", newTime + "ms");
+    }
+
+    function startRotate(target) {
+        if (!g.rotating) {
+            g.rotating = true;
+        } else {
+            return;
+        }
+        target.classList.add("rotate");
+
+        target.addEventListener("transitionend", middleRotate, true);
+        getStyle(".rotate").setProperty("transform", "rotate(360deg)");
+    }
+
+    function middleRotate(e) {
+        if (e.target.classList.contains("rotate")) {
+            e.target.removeEventListener("transitionend", middleRotate, true);
+            e.target.classList.remove("rotate");
+            g.rotating = false;
+        }
+    }
+
+    function addTime(t) {
+        g.time -= t;
+        updateClock();
+        flash(document.getElementById("time"));
+    }
+
+
+    function score(v) {
+        g.score += v;
+        showText("score", g.score);
+        flash(document.getElementById("score"));
+    }
+
+
+    return [
+        ["+\u231A", function () {
+                addTime(1000);
+            }],
+        ["+\u231A", function () {
+                addTime(1000);
+            }],
+        [ROTATE_TEXT, function () {
+                startRotate(document.getElementById("grid"));
+            }],
+        [" \u23E9", function () {
+                changeSpeed(0.8);
+            }],
+        [" \u23EA", function () {
+                changeSpeed(1.2);
+            }],
+        ["+1", function () {
+                score(1);
+            }],
+        ["+1", function () {
+                score(1);
+            }],
+        ["+1", function () {
+                score(1);
+            }],
+        ["+1", function () {
+                score(1);
+            }]
+    ];
+})();
 
 function showText(id, text) {
     var s = document.getElementById(id);
-    
+
     while (s.hasChildNodes()) {
         s.removeChild(s.firstChild);
     }
-    
-    s.appendChild(document.createTextNode(text));    
-}
 
-function score() {
-    g.score += 1;
-    showText("score","Score: " + g.score);
+    s.appendChild(document.createTextNode(text));
 }
 
 function getRandomInt() {
-  return Math.floor(Math.random() * 4);
+    return Math.floor(Math.random() * 4);
 }
 
 function drawGrid() {
@@ -60,104 +139,146 @@ function drawGrid() {
     for (i = 0; i < 4; i += 1) {
         row = document.createElement("div");
         row.classList.add("row");
+        row.addEventListener("transitionend", function (e) {
+            e.stopPropagation();
+        }, false);
         for (j = 0; j < 4; j += 1) {
             cell = document.createElement("div");
-            cell.id = "cell-" + i +"-" + j;
+            cell.id = "cell-" + i + "-" + j;
             cell.classList.add("cell");
             row.appendChild(cell);
-        }        
+        }
         grid.appendChild(row);
     }
 
     parent.appendChild(grid);
 }
 
-function tidy(box) {
-    box.removeEventListener("click", boxClick);
-    box.removeEventListener("transitionend", timeout, true);
-    box.addEventListener("transitionend", function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        box.parentNode.removeChild(box);
-        if (g.running) {
-            nextMole();
-        }
-    }, true);
-    
-}
-
-function timeout(e) {
+function moleEnd(e) {
     e.preventDefault();
     e.stopPropagation();
-    
-    var box = e.target;
-    
-    tidy(box);
-    
-    box.classList.remove("popup");
-    box.classList.add("popdown");
+    var mole = e.target;
 
-    box.style.height = 0;
+    mole.removeEventListener("transitionend", moleEnd, true);
+    if (mole.parentNode) {
+        mole.parentNode.removeChild(mole);
+    }
+    if (g.running) {
+        nextMole();
+    }
 }
 
-function boxClick(e) {
-    var box = e.target;
+function moleBounce(e) {
+    e.preventDefault();
+    e.stopPropagation();
 
-    tidy(box);      
-    
-    doRotate(document.getElementById("grid"));
-    
-    box.style.height = box.scrollHeight + "px";
+    var mole = e.target;
+    mole.removeEventListener("transitionend", moleBounce, true);
+    mole.addEventListener("transitionend", moleEnd, true);
 
-    box.classList.remove("popup");
-    box.classList.add("popout");
-    
-    box.style.background = "#fff";
-    score();
+    mole.classList.remove("popup");
+    mole.classList.add("popdown");
+
+    mole.style.transform = "translateY(50px)";
 }
 
-function showBox(cell) {
-    var box = document.createElement("div");
+function moleClick(e) {
+    var over = e.target;
+    var mole = over.parentNode;
 
-    box.classList.add("pop");
-    box.classList.add("popup");
-    box.style.height = "0px";
-        
+    // handle efects
+    mole.effects[1]();
+
+    // Stop transition animation
+    mole.style.transform = window.getComputedStyle(mole).transform;
+
+    // Tidy event listeners/classes
+    over.removeEventListener("click", moleClick);
+    if (mole.classList.contains("popup")) {
+        mole.removeEventListener("transitionend", moleBounce, true);
+        mole.classList.remove("popup");
+    } else if (mole.classList.contains("popdown")) {
+        mole.removeEventListener("transitionend", moleEnd, true);
+        mole.classList.remove("popdown");
+    }
+
+    // Start fade transiation
+    mole.addEventListener("transitionend", moleEnd, true);
+    mole.classList.add("popout");
+    mole.style.background = "#fff";
+    mole.style.color = "#fff";
+}
+
+function moleShow(cell) {
+    var mole = document.createElement("div");
+
+    do {
+        mole.effects = effects[Math.floor(Math.random() * effects.length)];
+    } while (mole.effects[0] === ROTATE_TEXT && g.currentEffect === mole.effects[0]);
+
+    g.currentEffect = mole.effects[0];
+
+    mole.classList.add("pop");
+    mole.classList.add("popup");
+    mole.style.transform = "translateY(50px)";
+
+    var text = document.createElement("span");
+    text.appendChild(document.createTextNode(mole.effects[0]));
+    mole.appendChild(text);
+
     setTimeout(function () {
-        box.style.height = "50px";
-        box.style.background = "#ffcc66";
+        mole.style.transform = "translateY(0px)";
+        mole.style.background = "#ffcc66";
     }, 25);
 
-    box.addEventListener("click", boxClick);
-    box.addEventListener("transitionend", timeout, true);
-    
-    cell.appendChild(box);
+    var over = document.createElement("div");
+    over.classList.add("pop-over");
+    over.addEventListener("click", moleClick);
+    mole.appendChild(over);
+
+    mole.addEventListener("transitionend", moleBounce, true);
+
+
+
+    cell.appendChild(mole);
 }
 
 function nextMole() {
-    var row = getRandomInt();
-    var col = getRandomInt();
+    var row, col, address, target;
 
-    var cell = document.getElementById("cell-" + row + "-" + col);
-    
-    showBox(cell);
+    do {
+        row = getRandomInt();
+        col = getRandomInt();
+
+        address = row + "-" + col;
+    } while (g.lastAddress === address);
+
+    target = document.getElementById("cell-" + address);
+    moleShow(target);
+}
+
+function updateClock() {
+    var remaining = 30 - (Math.floor(g.time / 1000));
+
+    if (remaining < 0) {
+        remaining = 0;
+    }
+
+    showText("time", remaining);
+    showText("times", (remaining !== 1 ? 's' : ''));
 }
 
 function tick() {
-    var sleep, left;
+    var sleep;
     var now = Date.now();
     var diff = (now - g.lastTick);
     g.lastTick = now;
 
     g.time += diff;
-    
-    left = 30 - (Math.floor(g.time / 1000) );
-    
-    showText("time", left + " second" + (left !== 1 ? 's' : ''));
-    
+
+    updateClock();
     sleep = 1000 - (g.time % 1000);
-    
+
     if (g.time < 30000) {
         setTimeout(tick, sleep);
     } else {
@@ -168,7 +289,7 @@ function tick() {
 function getStyle(selector) {
     var i;
     var sheet = document.getElementById("styles").sheet;
-    for (i = 0; i < sheet.cssRules.length; i+= 1) {
+    for (i = 0; i < sheet.cssRules.length; i += 1) {
         if (sheet.cssRules[i].type === 1 && sheet.cssRules[i].selectorText === selector) { // STYLE_RULE
             return sheet.cssRules[i].style;
         }
@@ -176,55 +297,32 @@ function getStyle(selector) {
     return null;
 }
 
-function changeSpeed(time) {
-    var style = getStyle(".popup");
-    var oldTime = style.getPropertyValue("transition-duration");
-    
-    style.setProperty("transition-duration", time);
-    setTimeout(function () { 
-        style.setProperty("transition-duration", oldTime);
-    }, 2000);   
-}
-
-function doRotate(target) {
-    target.classList.add("rotate");
-    
-    target.addEventListener("transitionend", doneRotate, true);
-    setTimeout(function () {
-        var style = getStyle(".rotate");
-        style.setProperty("transform", "rotate(360deg)");        
-    }, 10);
-    
-}
-
-function doneRotate(e) {
-    if (e.target.classList.contains("rotate")) {
-        e.target.removeEventListener("transitionend", doneRotate, true);       
-        var style = getStyle(".rotate");
-        style.setProperty("transform", "rotate(0deg)");
-        e.target.classList.remove("rotate");
-    }
+function flash(target) {
+    target.classList.add("flasher");
+    target.addEventListener("animationend", function () {
+        target.classList.remove("flasher");
+    });
 }
 
 function listStyles() {
     var ss = document.getElementById("styles").sheet;
     var i, j, style, name, rule;
-    for (i = 0; i < ss.cssRules.length; i+= 1) {
-        if (ss.cssRules[i].type === 1 ) { // STYLE_RULE
+    for (i = 0; i < ss.cssRules.length; i += 1) {
+        if (ss.cssRules[i].type === 1) { // STYLE_RULE
             name = ss.cssRules[i].selectorText;
             style = ss.cssRules[i].style;
-            
+
             console.log("Got a block called " + name);
-            for (j = 0; j < style.length ; j+= 1) {                
+            for (j = 0; j < style.length; j += 1) {
                 console.log(j + ": " + style[j]);
-            }            
+            }
         }
     }
 }
 
 function init() {
     drawGrid();
-    g.lastTick = Date.now();   
+    g.lastTick = Date.now();
 //    listStyles();
     nextMole();
     tick();
