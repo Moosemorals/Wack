@@ -81,7 +81,6 @@ body {
     z-index: 3;
 }
 
-
 .popup {
     transition: transform 1500ms cubic-bezier(0.645, 0.045, 0.355, 1);
 }

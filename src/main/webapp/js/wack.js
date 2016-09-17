@@ -85,18 +85,18 @@ var effects = (function () {
 
     return [
         ["+\u231A", function () {
-                addTime(1000);
+                addTime(1500);
             }],
         ["+\u231A", function () {
-                addTime(1000);
+                addTime(1500);
             }],
         [ROTATE_TEXT, function () {
                 startRotate(document.getElementById("grid"));
             }],
-        [" \u23E9", function () {
+        ["▶▶", function () {
                 changeSpeed(0.8);
             }],
-        [" \u23EA", function () {
+        ["◀◀", function () {
                 changeSpeed(1.2);
             }],
         ["+1", function () {
