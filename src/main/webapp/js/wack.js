@@ -26,7 +26,9 @@
 var ROTATE_TEXT = " \u27F3";
 
 var g = {
-    grid: document.getElementById("grid"),
+    board: document.getElementById("grid"),
+    start: document.getElementById("start"),
+    wack: document.getElementById("wack"),
     score: 0,
     time: 0,
     lastTick: 0,
@@ -34,6 +36,15 @@ var g = {
     rotating: false,
     currentEffect: null
 };
+
+function score(v) {
+    g.score += v;
+    if (g.score < 0) {
+        g.score = 0;
+    }
+    showText("score", g.score);
+    flash(document.getElementById("score"));
+}
 
 var effects = (function () {
 
@@ -75,14 +86,6 @@ var effects = (function () {
         updateClock();
         flash(document.getElementById("time"));
     }
-
-
-    function score(v) {
-        g.score += v;
-        showText("score", g.score);
-        flash(document.getElementById("score"));
-    }
-
 
     return [
         ["+\u231A", function () {
@@ -232,9 +235,8 @@ function moleShow(address) {
 
     mole.addEventListener("transitionend", moleBounce, true);
 
-    g.grid.insertBefore(mole, g.block);
+    g.board.insertBefore(mole, g.block);
 }
-
 
 function nextMole() {
     moleShow({row: getRandomInt(), col: getRandomInt()});
@@ -265,7 +267,7 @@ function tick() {
     if (g.time < 30000) {
         setTimeout(tick, sleep);
     } else {
-        g.running = false;
+        endGame();
     }
 }
 
@@ -287,21 +289,45 @@ function flash(target) {
     });
 }
 
+function checkMiss(e) {
+    if (e.target.id === "wack") {
+        score(-1);
+    }
+}
+
 function buildBoard() {
     g.line = document.createElement("div");
     g.line.id = "line";
-    g.grid.appendChild(g.line);
+    g.board.appendChild(g.line);
 
     g.block = document.createElement("div");
     g.block.classList.add("block");
-    g.grid.insertBefore(g.block, g.line);
+    g.board.insertBefore(g.block, g.line);
 }
 
-function init() {
+function startGame() {
+    g.start.removeEventListener("click", startGame);
+    g.start.disabled = true;
     g.lastTick = Date.now();
+    g.score = 0;
+    g.time = 0;
+
     buildBoard();
     nextMole();
     tick();
+    g.wack.addEventListener("click", checkMiss);
 }
 
-document.addEventListener("DOMContentLoaded", init);
+function endGame() {
+    g.running = false;
+    g.wack.removeEventListener("click", checkMiss);
+    g.start.addEventListener("click", startGame);
+
+    while (g.board.hasChildren) {
+        g.board.removeChild(g.board.firstChild);
+    }
+    g.start.disabled = false;
+}
+
+
+g.start.addEventListener("click", startGame);
