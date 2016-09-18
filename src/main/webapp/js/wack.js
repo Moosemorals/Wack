@@ -26,6 +26,7 @@
 var ROTATE_TEXT = " \u27F3";
 
 var g = {
+    grid: document.getElementById("grid"),
     score: 0,
     time: 0,
     lastTick: 0,
@@ -90,14 +91,17 @@ var effects = (function () {
         ["+\u231A", function () {
                 addTime(1500);
             }],
-        [ROTATE_TEXT, function () {
-                startRotate(document.getElementById("grid"));
-            }],
+        //  [ROTATE_TEXT, function () {
+        //          startRotate(g.grid);
+        //      }],
         ["▶▶", function () {
-                changeSpeed(0.8);
+                changeSpeed(0.5);
             }],
         ["◀◀", function () {
                 changeSpeed(1.2);
+            }],
+        ["+1", function () {
+                score(1);
             }],
         ["+1", function () {
                 score(1);
@@ -128,32 +132,6 @@ function getRandomInt() {
     return Math.floor(Math.random() * 4);
 }
 
-function drawGrid() {
-    var i, j, row, cell;
-    var grid = document.getElementById("grid");
-    var parent = grid.parentNode;
-
-    parent.removeChild(grid);
-
-
-    for (i = 0; i < 4; i += 1) {
-        row = document.createElement("div");
-        row.classList.add("row");
-        row.addEventListener("transitionend", function (e) {
-            e.stopPropagation();
-        }, false);
-        for (j = 0; j < 4; j += 1) {
-            cell = document.createElement("div");
-            cell.id = "cell-" + i + "-" + j;
-            cell.classList.add("cell");
-            row.appendChild(cell);
-        }
-        grid.appendChild(row);
-    }
-
-    parent.appendChild(grid);
-}
-
 function moleEnd(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -179,7 +157,7 @@ function moleBounce(e) {
     mole.classList.remove("popup");
     mole.classList.add("popdown");
 
-    mole.style.transform = "translateY(50px)";
+    mole.style.transform = "translate3d(" + mole.col + "px, 50px, " + mole.row + "px)";
 }
 
 function moleClick(e) {
@@ -209,7 +187,7 @@ function moleClick(e) {
     mole.style.color = "#fff";
 }
 
-function moleShow(cell) {
+function moleShow(address) {
     var mole = document.createElement("div");
 
     do {
@@ -220,14 +198,19 @@ function moleShow(cell) {
 
     mole.classList.add("pop");
     mole.classList.add("popup");
-    mole.style.transform = "translateY(50px)";
+    mole.col = (address.col * 40) + 40;
+    mole.row = (address.row * -15);
+    mole.style.transform = "translate3d(" + mole.col + "px, 50px, " + mole.row + "px) ";
+
+    g.block.style.transform = "translate3d(" + (mole.col - 5) + "px, 0px, " + mole.row + "px)";
 
     var text = document.createElement("span");
     text.appendChild(document.createTextNode(mole.effects[0]));
+
     mole.appendChild(text);
 
     setTimeout(function () {
-        mole.style.transform = "translateY(0px)";
+        mole.style.transform = "translate3d(" + mole.col + "px, 0px, " + mole.row + "px) ";
         mole.style.background = "#ffcc66";
     }, 25);
 
@@ -238,23 +221,12 @@ function moleShow(cell) {
 
     mole.addEventListener("transitionend", moleBounce, true);
 
-
-
-    cell.appendChild(mole);
+    g.grid.appendChild(mole);
 }
 
+
 function nextMole() {
-    var row, col, address, target;
-
-    do {
-        row = getRandomInt();
-        col = getRandomInt();
-
-        address = row + "-" + col;
-    } while (g.lastAddress === address);
-
-    target = document.getElementById("cell-" + address);
-    moleShow(target);
+    moleShow({row: getRandomInt(), col: getRandomInt()});
 }
 
 function updateClock() {
@@ -321,8 +293,11 @@ function listStyles() {
 }
 
 function init() {
-    drawGrid();
     g.lastTick = Date.now();
+    g.block = document.createElement("div");
+    g.block.classList.add("block");
+    g.grid.appendChild(g.block);
+
 //    listStyles();
     nextMole();
     tick();

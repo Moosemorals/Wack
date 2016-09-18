@@ -26,32 +26,44 @@ THE SOFTWARE.
     Author     : osric
 */
 
-body {
-    width: 236px;
-    margin: 0 auto;
+* {
+    border: thin solid green;
+}
+#wack {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    position: relative;
+    width: 640px;
+    height: 300px;
+    border: thick solid black;
+    border-radius: 8px;
+    margin: 20px auto;
     font-family: Corbel, "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "DejaVu Sans", "Bitstream Vera Sans", "Liberation Sans", Verdana, "Verdana Ref", sans serif;
 }
 #grid {
-
+    width: 240px;
+    perspective: 40px;
+    transform: scale(2);
+    position: absolute;
+    top: 160px;
+    flex: 1 0 auto;
 }
 
 #status {
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
-    justify-content: space-around;
+    justify-content: space-between;
+    width: 50%;
 }
 
-.cell {
-    position: relative;
-    overflow: hidden;
+.block {
+    background: white;
     z-index: 4;
-    display: inline-block;
-    width: 50px;
+    width: 60px;
     height: 50px;
-    margin: 4px;
-    border: thin solid black;
-    border-radius: 4px;
+    position: absolute;
 }
 
 .pop {
