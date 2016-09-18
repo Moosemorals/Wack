@@ -86,33 +86,44 @@ var effects = (function () {
 
     return [
         ["+\u231A", function () {
+                score(1);
                 addTime(1500);
             }],
         ["+\u231A", function () {
+                score(1);
                 addTime(1500);
             }],
         //  [ROTATE_TEXT, function () {
         //          startRotate(g.grid);
         //      }],
         ["▶▶", function () {
+                score(1);
+                changeSpeed(0.5);
+            }],
+        ["▶▶", function () {
+                score(1);
                 changeSpeed(0.5);
             }],
         ["◀◀", function () {
+                score(1);
                 changeSpeed(1.2);
             }],
-        ["+1", function () {
+        ["", function () {
                 score(1);
             }],
-        ["+1", function () {
+        ["", function () {
                 score(1);
             }],
-        ["+1", function () {
+        ["", function () {
                 score(1);
             }],
-        ["+1", function () {
+        ["", function () {
                 score(1);
             }],
-        ["+1", function () {
+        ["", function () {
+                score(1);
+            }],
+        ["", function () {
                 score(1);
             }]
     ];
@@ -221,7 +232,7 @@ function moleShow(address) {
 
     mole.addEventListener("transitionend", moleBounce, true);
 
-    g.grid.appendChild(mole);
+    g.grid.insertBefore(mole, g.block);
 }
 
 
@@ -276,29 +287,19 @@ function flash(target) {
     });
 }
 
-function listStyles() {
-    var ss = document.getElementById("styles").sheet;
-    var i, j, style, name, rule;
-    for (i = 0; i < ss.cssRules.length; i += 1) {
-        if (ss.cssRules[i].type === 1) { // STYLE_RULE
-            name = ss.cssRules[i].selectorText;
-            style = ss.cssRules[i].style;
+function buildBoard() {
+    g.line = document.createElement("div");
+    g.line.id = "line";
+    g.grid.appendChild(g.line);
 
-            console.log("Got a block called " + name);
-            for (j = 0; j < style.length; j += 1) {
-                console.log(j + ": " + style[j]);
-            }
-        }
-    }
+    g.block = document.createElement("div");
+    g.block.classList.add("block");
+    g.grid.insertBefore(g.block, g.line);
 }
 
 function init() {
     g.lastTick = Date.now();
-    g.block = document.createElement("div");
-    g.block.classList.add("block");
-    g.grid.appendChild(g.block);
-
-//    listStyles();
+    buildBoard();
     nextMole();
     tick();
 }

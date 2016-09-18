@@ -26,9 +26,15 @@ THE SOFTWARE.
     Author     : osric
 */
 
-* {
-    border: thin solid green;
+body {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
 }
+
 #wack {
     display: flex;
     flex-flow: column nowrap;
@@ -58,19 +64,24 @@ THE SOFTWARE.
     width: 50%;
 }
 
+#line {
+    position: absolute;
+    width: 240px;
+    height: 1px;
+    background: blue;
+}
+
 .block {
     background: white;
-    z-index: 4;
     width: 60px;
-    height: 50px;
+    height: 60px;
     position: absolute;
 }
 
 .pop {
     cursor: pointer;
-    z-index: 2;
     color: black;
-    display: inline-flex;
+    display: flex;
     justify-content: center;
     align-items: center;
     width: 50px;
@@ -78,9 +89,7 @@ THE SOFTWARE.
     margin: 4px;
     border-radius: 4px;
     position: absolute;
-    bottom: -4px;
-    left: -4px;
-    border: none;
+    bottom: -6px;
     transform-origin: bottom;
 }
 
