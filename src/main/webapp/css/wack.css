@@ -26,6 +26,10 @@ THE SOFTWARE.
     Author     : osric
 */
 
+* {
+    border: thin solid black;
+}
+
 body {
     display: flex;
     flex-flow: column nowrap;
@@ -64,15 +68,18 @@ body {
     width: 50%;
 }
 
-#line {
+#ground {
+    background: white;
     position: absolute;
     width: 240px;
-    height: 1px;
-    background: blue;
+    height: 120px;
+    transform: rotateX(80deg) translate3d(0, 120px, 0px);
+
+    border: thin solid black;
 }
 
 .block {
-    background: white;
+
     width: 60px;
     height: 60px;
     position: absolute;

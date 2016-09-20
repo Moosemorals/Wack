@@ -171,7 +171,7 @@ function moleBounce(e) {
     mole.classList.remove("popup");
     mole.classList.add("popdown");
 
-    mole.style.transform = "translate3d(" + mole.col + "px, 50px, " + mole.row + "px)";
+    mole.style.transform = "translate3d(" + mole.col + "px, 100px, " + mole.row + "px)";
 }
 
 function moleClick(e) {
@@ -214,9 +214,7 @@ function moleShow(address) {
     mole.classList.add("popup");
     mole.col = (address.col * 40) + 40;
     mole.row = (address.row * -15);
-    mole.style.transform = "translate3d(" + mole.col + "px, 50px, " + mole.row + "px) ";
-
-    g.block.style.transform = "translate3d(" + (mole.col - 5) + "px, 0px, " + mole.row + "px)";
+    mole.style.transform = "translate3d(" + mole.col + "px, 100px, " + mole.row + "px) ";
 
     var text = document.createElement("span");
     text.appendChild(document.createTextNode(mole.effects[0]));
@@ -224,7 +222,7 @@ function moleShow(address) {
     mole.appendChild(text);
 
     setTimeout(function () {
-        mole.style.transform = "translate3d(" + mole.col + "px, 0px, " + mole.row + "px) ";
+        mole.style.transform = "translate3d(" + mole.col + "px, 50px, " + mole.row + "px) ";
         mole.style.background = "#ffcc66";
     }, 25);
 
@@ -235,6 +233,7 @@ function moleShow(address) {
 
     mole.addEventListener("transitionend", moleBounce, true);
 
+    g.block.style.transform = "translate3d(" + (mole.col - 5) + "px, 0px, " + mole.row + "px)";
     g.board.insertBefore(mole, g.block);
 }
 
@@ -296,13 +295,13 @@ function checkMiss(e) {
 }
 
 function buildBoard() {
-    g.line = document.createElement("div");
-    g.line.id = "line";
-    g.board.appendChild(g.line);
+    g.ground = document.createElement("div");
+    g.ground.id = "ground";
+    g.board.appendChild(g.ground);
 
     g.block = document.createElement("div");
     g.block.classList.add("block");
-    g.board.insertBefore(g.block, g.line);
+    g.board.insertBefore(g.block, g.ground);
 }
 
 function startGame() {

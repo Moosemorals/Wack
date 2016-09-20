@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<!--
+The MIT License
+
+Copyright 2016 osric.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+<html>
+    <head>
+        <title>Testing transforms</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style type="text/css">
+            #holder {
+                perspective: 130px;
+                perspective-origin: center top;
+                transform: translate3d(0px, 100px, 0px);
+                position: relative;
+                width: 250px;
+                height: 250px;
+                margin: 0 auto;
+            }
+            .ground {
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                box-sizing: border-box;
+                border-left: thin solid black;
+                border-right: thin solid black;
+                background: lightblue;
+                width: 250px;
+                height: 31px;
+            }
+
+            #g1 {
+                border-top: thin solid black;
+                border-top-left-radius: 15px;
+                border-top-right-radius: 15px;
+                transform:  rotateX(90deg) translate3d(0px, -60px, -200px);
+            }
+
+            #g2 {
+                transform:  rotateX(90deg) translate3d(0px, -30px, -200px);
+            }
+
+            #g3 {
+                transform: rotateX(90deg)  translate3d(0px, 0px, -200px);
+            }
+
+            #g4 {
+                border-bottom: thin solid black;
+                border-bottom-left-radius: 30px;
+                border-bottom-right-radius: 30px;
+                transform:  rotateX(90deg) translate3d(0px, 30px, -200px);
+            }
+
+            #wall {
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                transform: translate3d(0px, 200px, -200px);
+                border: thin solid black;
+                background: lightgreen;
+                width: 50px;
+                height: 50px;
+            }
+
+            #block {
+                display: none;
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                transform: translate3d(0px, 200px, -200px);
+                background: white;
+                width: 250px;
+                height: 100px;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div id="holder">
+            <div id="g1" class="ground"></div>
+            <div id="g2" class="ground"></div>
+            <div id="wall"></div>
+            <div id="block"></div>
+            <div id="g3" class="ground"></div>
+            <div id="g4" class="ground"></div>
+        </div>
+    </body>
+</html>
